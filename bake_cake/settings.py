@@ -65,7 +65,7 @@ DATABASES = {
         }
 }
 
-# AUTH_USER_MODEL = "app.CustomUser"
+AUTH_USER_MODEL = "app.CustomUser"
 LOGIN_URL = "/"
 
 AUTH_PASSWORD_VALIDATORS = [
