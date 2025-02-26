@@ -30,13 +30,17 @@
                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                                     <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
                                 </svg>
+                                {% verbatim %}
                                 {{Step === 'Number' ? 'Введите номер' : 'Введите код'}}</error-message></small>
+                                {% endverbatim %}
                             <error-message name="phone_format" class="fs_12 cake_pink text-center position-absolute bottom-0"></error-message>
                             <error-message name="code_format" class="fs_12 cake_pink text-center position-absolute bottom-0"></error-message>
                         </v-form>
     
                         <div class="modal-footer d-flex flex-column justify-content-between align-items-center text-center border-0 mx-5">
+                            {% verbatim %}
                             <p class="fs_12 cake_grey">{{Step === `Number` ? `Нажимая на кнопку, вы соглашаетесь на обработку персональных данных в соответствии с политикой конфиденциальности` : Step === 'Code' ? `Осталось времени: 05:00` : ``}}</p>
+                            {% endverbatim %}
                             <a href="#" v-if="Step === `Code`" @click.prevent="ToRegStep1" class="text-decoration-none cake_pink fs_12">изменить данные</a>
                         </div>
                     </div>
@@ -125,7 +129,9 @@
                         <error-message name="form" class="from__alert"></error-message>
                         <error-message name="topping" class="from__alert"></error-message>
                     </span>
+                            {% verbatim %}
                             <span class="z-index-1 fs_40 cake_pink text-end mt-5" id="cost">{{ Cost }}₽</span>
+                            {% endverbatim %}
                         </div>
                         <div class="d-flex align-items-center flex-wrap mb-3">
                             <span class="me-3 fs_40 cake_blue">Количество уровней</span>
@@ -287,6 +293,7 @@
                                 <div class="col-12 col-lg-4 d-flex justify-content-center justify-content-lg-end">
                                     <div class="cake__card p-4 position-relative cake_grey">
                                         <span class="cake__badge rounded-pill">?</span>
+                                        {% verbatim %}
                                         <span>Количество уровней: {{ DATA.Levels[Levels] }}</span>
                                         <span>Форма уровней: {{ DATA.Forms[Form] }}</span>
                                         <p>Топинг: {{ DATA.Toppings[Topping] }}</p>
@@ -296,6 +303,7 @@
                                             <li>Декор: {{ DATA.Decors[Decor] }}</li>
                                         </ul>
                                         <span>{{ Words === '' ? 'Без надписи' : Words }}</span>
+                                        {% endverbatim %}
                                     </div>
                                 </div>
                             </div>
@@ -329,6 +337,7 @@
                                     <div class="d-flex">
                                         <span class="cake_pink fs_40 fw-bold me-2">Итого: {{ Cost }}₽</span>
                                     </div>
+                                    
                                     <button type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">К оплате</button>
                                 </div>
                             </div>
