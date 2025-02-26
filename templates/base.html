@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	<link rel="stylesheet" href="{% static 'css/Style.css' %}">
+	<!-- Для разработки: -->
+	<script src="https://unpkg.com/vue@3"></script>
+	<!-- Для продакшина: -->
+	<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script> -->
+	<script src="https://unpkg.com/vee-validate"></script>
+	<title>{% block title%} {% endblock %}</title>
+</head>
+<body>
+<header class="navbar navbar-expand-xl navbar-light fixed-top bg-white py-4">
+	<nav class="container">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<a class="navbar-brand" href="#">
+			<img src="{% static 'img/Logo.svg' %}" alt="CakeBake">
+		</a>
+		<div class="collapse navbar-collapse justify-content-end" id="navbar">
+			<ul class="navbar-nav">
+				<li class="nav-item me-5">
+					<a class="nav-link fw-lighter cake_blue" href="#step3">Создать торт</a>
+				</li>
+				<li class="nav-item me-5">
+					<a class="nav-link fw-lighter cake_blue" href="#step2">Каталог</a>
+				</li>
+				<li class="nav-item me-5">
+					<a class="nav-link fw-lighter cake_blue" href="#step4">Оплата и доставка</a>
+				</li>
+				<li class="nav-item me-5">
+					<a class="nav-link fw-lighter cake_blue" href="#Contacts">Контакты</a>
+				</li>
+				<li class="nav-item d-block d-xl-flex flex-column align-items-end me-5">
+					<small class="fw-lighter text-decoration-none fs_12 cake_blue">8 (495) 000-00-00</small>
+					<small class="fw-lighter text-decoration-none fs_12 cake_blue">Пн - Вс 10:00—20:00</small>
+				</li>
+				<li class="nav-item d-flex align-items-center">
+					<a class="nav-link fw-lighter me-1 cake_blue position-relative" href="#">
+						<img src="{% static 'img/shopping-cart.svg' %}" alt="">
+						<!--метка на иконке, убрать класс d-none чтоб появилась-->
+						<span class="position-absolute translate-middle badge rounded-pill cake__bg_pink fs_8 d-none">1</span>
+					</a>
+					<a class="nav-link fw-lighter me-1 cake_blue position-relative" href="#RegModal" data-bs-toggle="modal">
+						<img src="{% static 'img/user.svg' %}" alt="">
+						<!--метка на иконке, убрать класс d-none чтоб появилась-->
+						<span class="position-absolute translate-middle badge rounded-pill cake__bg_pink fs_8 d-none">1</span>
+					</a>
+					<a class="nav-link fw-lighter cake_grey fs_12 d-none" href="#">
+						Ирина
+					</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
+</header>
+{% block content %}
+{% endblock %}
+</body>
+</html>
