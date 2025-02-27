@@ -31,39 +31,36 @@ def index(request):
     return render(request, "index.html")
 
 
-def lk(request):
-    return render(request, "lk.html")
-
-
 class ClientLoginView(View):
     def get(self, request):
-        return redirect("app:index")
+        pass
 
     def post(self, request):
-        name = request.POST.get("FULL_NAME_CREATE")
-        email = request.POST.get("EMAIL_CREATE")
-        password = request.POST.get("PASSWORD_CREATE")
-        try:
-            user = get_user_model().objects.create_user(
-                email=email, username=email, password=password
-            )
-            ClientUser.objects.create(full_name=name, user=user)
-        except IntegrityError:
-            return JsonResponse(
-                {
-                    "success": False,
-                    "error_message": "Пользователь с таким email уже зарегистрирован",
-                }
-            )
-        login(request, user)
+        phone_number = request.POST.get("phone_number")
+
+        user = authenticate(phone_number=phone_number)
+
+        if user:
+            login(request, user)
+        else:
+            try:
+                phone_number_normalised = normalise_phone_number(phone_number)
+            except (ValidationError, NumberParseException):
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "error_message": "⚠ Формат телефона нарушен",
+                    }
+                )
 
         return JsonResponse({"success": True})
+
 
 
 class ClientLogoutView(View):
     def get(self, request):
         logout(request)
-        return redirect("app:index")
+        return
 
 
 class ClientProfileView(View):

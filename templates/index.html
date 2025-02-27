@@ -6,47 +6,29 @@
 {% block content %}
     <main>
         <div class="container mt-header">
-            <aside class="modal fade" id="RegModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="RegModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content px-4 cake__modal">
-                        <div class="modal-header border-0 pb-0 pt-4">
-                            <button @click="Reset" type="button" class="btn-close border rounded-pill" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-header border-0 py-0">
-                            <label for="reg" class="modal-title font_Gogh fs_40 cake_blue" id="RegModalLabel">Вход / Регистрация</label>
-                        </div>
-                        <form class="d-none">
-                            <input v-model="RegInput" type="text" name="REG">
-                            <button type="submit" ref="HiddenFormSubmitReg">reg</button>
-                        </form>
-                        <v-form :validation-schema="RegSchema" class="modal-body position-relative d-flex flex-column align-items-center px-5 pb-4" @submit="RegSubmit">
-                            <v-field v-if="RegInput !== 'Регистрация успешна'" v-model="RegInput" name="reg" type="text" id="reg" :placeholder="Step === `Number` ? `Введите ваш номер` : `Введите код`" class="form-control cake__textinput"></v-field>
-                            <v-field v-if="Step === 'Number'" v-model="RegInput" type="phone" name="phone_format" class="d-none"></v-field>
-                            <v-field v-if="Step === 'Code'" v-model="RegInput" type="phone" name="code_format" class="d-none"></v-field>
-                            <button v-if="RegInput !== 'Регистрация успешна'" type="submit" class="btn text-white w-100 rounded-pill mt-3 py-2 shadow-none cake__button fs_12 cake__bg_pink">Отправить</button>
-                            <span v-if="RegInput === 'Регистрация успешна'" class="cake_grey text-center">Регистрация успешна</span>
-                            <small class="fs_12 cake_pink text-center position-absolute bottom-0"><error-message name="reg">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-exclamation-circle mb-1" viewBox="0 0 16 16">
-                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
-                                </svg>
-                                {% verbatim %}
-                                {{Step === 'Number' ? 'Введите номер' : 'Введите код'}}</error-message></small>
-                                {% endverbatim %}
-                            <error-message name="phone_format" class="fs_12 cake_pink text-center position-absolute bottom-0"></error-message>
-                            <error-message name="code_format" class="fs_12 cake_pink text-center position-absolute bottom-0"></error-message>
-                        </v-form>
-    
-                        <div class="modal-footer d-flex flex-column justify-content-between align-items-center text-center border-0 mx-5">
-                            {% verbatim %}
-                            <p class="fs_12 cake_grey">{{Step === `Number` ? `Нажимая на кнопку, вы соглашаетесь на обработку персональных данных в соответствии с политикой конфиденциальности` : Step === 'Code' ? `Осталось времени: 05:00` : ``}}</p>
-                            {% endverbatim %}
-                            <a href="#" v-if="Step === `Code`" @click.prevent="ToRegStep1" class="text-decoration-none cake_pink fs_12">изменить данные</a>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-    
+			<aside class="modal fade" id="RegModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="RegModalLabel" aria-hidden="true">
+			
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content px-4 cake__modal">
+						<div class="modal-header border-0 pb-0 pt-4">
+							<button type="button" class="btn-close border rounded-pill" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-header border-0 py-0">
+							<label for="reg" class="modal-title font_Gogh fs_40 cake_blue" id="RegModalLabel">Вход / Регистрация</label>
+						</div>
+						<form id="RegModalForm" class="modal-body position-relative d-flex flex-column align-items-center px-5 pb-4">
+						{% csrf_token %}
+							<input type="text" required name="phone_number" class="form-control cake__textinput" placeholder="Введите ваш номер">
+							<button type="submit" class="btn text-white w-100 rounded-pill mt-3 py-2 shadow-none cake__button fs_12 cake__bg_pink">Отправить</button>
+							
+							<small id="RegModalFormError" class="fs_12 cake_pink text-center position-absolute bottom-0"></small>
+						</form>
+						<div class="modal-footer d-flex flex-column justify-content-between align-items-center text-center border-0 mx-5">
+							<p class="fs_12 cake_grey">Нажимая на кнопку, вы соглашаетесь на обработку персональных данных в соответствии с политикой конфиденциальности</p>
+						</div>
+					</div>
+				</div>
+			</aside>
             <article class="row position-relative">
                 <div class="col-12 col-xxl-6 d-flex justify-content-center"> 
                     <img src="{% static 'img/Cake.png' %}" alt="">
@@ -381,7 +363,7 @@
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js" integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{% static 'js/index.js' %}"></script>
     <script src="{% static 'js/registration.js' %}"></script>
 {% endblock %}

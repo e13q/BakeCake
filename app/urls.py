@@ -3,8 +3,6 @@ from django.urls import path
 
 from . import views
 
-app_name = "app"
-
 urlpatterns = [
     path("", views.index, name="index"),
     path("lk/", login_required(views.ClientProfileView.as_view()),
