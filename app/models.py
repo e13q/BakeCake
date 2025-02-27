@@ -3,30 +3,19 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-class CustomUser(AbstractUser):
-    email = models.EmailField("Email", max_length=255, unique=True)
-    USERNAME_FIELD = "email"
+class ClientUser(AbstractUser):
+    phone_number = PhoneNumberField("Номер телефона", region="RU", unique=True)
+    full_name = models.CharField("ФИО", max_length=200, blank=True)
+    email = models.EmailField("Email", max_length=255, blank=True)
+    USERNAME_FIELD = "phone_number"
     REQUIRED_FIELDS = ["username"]
 
     def __str__(self):
-        return self.email
-
-    class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
-
-
-class Client(models.Model):
-    full_name = models.CharField("ФИО", max_length=200)
-    user = models.OneToOneField(CustomUser, on_delete=models.PROTECT)
-    phone_number = PhoneNumberField("Номер телефона", region="RU", blank=True)
+        return str(self.phone_number)
 
     class Meta:
         verbose_name = "Клиент"
         verbose_name_plural = "Клиенты"
-
-    def __str__(self) -> str:
-        return self.full_name
 
 
 class Level(models.Model):
@@ -163,7 +152,7 @@ class Order(models.Model):
     date = models.DateField("Дата заказа", auto_now_add=True)
     time = models.TimeField("Время заказа", auto_now_add=True)
     client = models.ForeignKey(
-        Client, on_delete=models.PROTECT, verbose_name="Клиент"
+        ClientUser, on_delete=models.PROTECT, verbose_name="Клиент"
     )
     cake = models.ForeignKey(
         Cake, on_delete=models.PROTECT, verbose_name="Торт"
@@ -177,7 +166,7 @@ class Order(models.Model):
         Invoice,
         on_delete=models.PROTECT,
         verbose_name="Счет на оплату",
-        related_name='orders'
+        related_name="orders",
     )
     comment = models.CharField(
         "Комментарий для курьера",

@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
-import dj_database_url
 
+import dj_database_url
 from environs import Env
 
 env = Env()
@@ -10,9 +10,7 @@ env.read_env()
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env.str("SECRET_KEY")
 DEBUG = env.bool("DEBUG", True)
-ALLOWED_HOSTS = env.list(
-    "ALLOWED_HOSTS", ["127.0.0.1", "localhost"]
-)
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", ["127.0.0.1", "localhost"])
 VK_API_TOKEN = env.str("VK_TOKEN")
 
 INSTALLED_APPS = [
@@ -56,16 +54,15 @@ TEMPLATES = [
 WSGI_APPLICATION = "bake_cake.wsgi.application"
 
 DATABASES = {
-    "default":
-        env.str("DATABASE_URL", None) and dj_database_url.parse(
-            os.getenv('DATABASE_URL')
-        ) or {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+    "default": env.str("DATABASE_URL", None)
+    and dj_database_url.parse(os.getenv("DATABASE_URL"))
+    or {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
 }
 
-AUTH_USER_MODEL = "app.CustomUser"
+AUTH_USER_MODEL = "app.ClientUser"
 LOGIN_URL = "/"
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -95,16 +92,21 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CSRF_TRUSTED_ORIGINS = env.str('CSRF_TRUSTED_ORIGINS', default='http://localhost').split(',')
-if CSRF_TRUSTED_ORIGINS != ['http://localhost']:
-    SECURE_PROXY_SSL_HEADER = CSRF_TRUSTED_ORIGINS and ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = env.str(
+    "CSRF_TRUSTED_ORIGINS", default="http://localhost"
+).split(",")
+if CSRF_TRUSTED_ORIGINS != ["http://localhost"]:
+    SECURE_PROXY_SSL_HEADER = CSRF_TRUSTED_ORIGINS and (
+        "HTTP_X_FORWARDED_PROTO",
+        "https",
+    )
     SECURE_SSL_REDIRECT = True
 
-#DEFAULT_FROM_EMAIL = "webmaster@localhost" # For reset password functionality
+# DEFAULT_FROM_EMAIL = "webmaster@localhost" # For reset password functionality
