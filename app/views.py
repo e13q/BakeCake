@@ -1,18 +1,5 @@
-from django.shortcuts import render
-
-# from .forms import OrderForm
 import json
-from .models import (
-    ClientUser,
-    Form,
-    Level,
-    Topping,
-    Berry,
-    Decor,
-    Cake,
-    Invoice,
-    Order,
-)
+
 import phonenumbers as ph
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login, logout
@@ -27,7 +14,17 @@ from django.urls import reverse
 from django.views import View
 from phonenumbers import NumberParseException
 
-from django.shortcuts import render
+from .models import (
+    Berry,
+    Cake,
+    ClientUser,
+    Decor,
+    Form,
+    Invoice,
+    Level,
+    Order,
+    Topping,
+)
 
 
 def normalise_phone_number(pn):
@@ -122,7 +119,36 @@ class ClientLogoutView(View):
 
 class ClientProfileView(View):
     def get(self, request):
-        pass
+        return render(request, "lk.html")
 
     def post(self, request):
-        pass
+        full_name = request.POST.get("full_name")
+        phone_number = request.POST.get("phone_number")
+        email = request.POST.get("email")
+        user = request.user
+
+        try:
+            phone_number_normalised = normalise_phone_number(phone_number)
+        except (ValidationError, NumberParseException):
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error_message": "⚠ Формат телефона нарушен",
+                }
+            )
+
+        if user.full_name != full_name:
+            user.full_name = full_name
+            user.save()
+
+        if user.phone_number != phone_number_normalised:
+            username = f"user{str(phone_number_normalised).replace('+', '_')}"
+            user.username = username
+            user.phone_number = phone_number_normalised
+            user.save()
+
+        if user.email != email:
+            user.email = email
+            user.save()
+
+        return JsonResponse({"success": True})
