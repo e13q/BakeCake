@@ -2,7 +2,17 @@ from django.shortcuts import render
 
 # from .forms import OrderForm
 import json
-from .models import ClientUser, Form, Level, Topping, Berry, Decor, Cake, Invoice, Order
+from .models import (
+    ClientUser,
+    Form,
+    Level,
+    Topping,
+    Berry,
+    Decor,
+    Cake,
+    Invoice,
+    Order,
+)
 import phonenumbers as ph
 from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login, logout
@@ -47,7 +57,7 @@ def index(request):
         "Toppings": toppings_prices,
         "Berries": berries_prices,
         "Decors": decors_prices,
-        "Words": 500
+        "Words": 500,
     }
     levels_titles = list(Level.objects.values_list("title", flat=True))
     forms_titles = list(Form.objects.values_list("title", flat=True))
@@ -62,11 +72,11 @@ def index(request):
         "decors": decors_titles.copy(),
         "costs_json": json.dumps(costs),
     }
-    levels_titles.insert(0, 'не выбрано')
-    forms_titles.insert(0, 'не выбрано')
-    toppings_titles.insert(0, 'не выбрано')
-    berries_titles.insert(0, 'нет')
-    decors_titles.insert(0, 'нет')
+    levels_titles.insert(0, "не выбрано")
+    forms_titles.insert(0, "не выбрано")
+    toppings_titles.insert(0, "не выбрано")
+    berries_titles.insert(0, "нет")
+    decors_titles.insert(0, "нет")
     data = {
         "Levels": levels_titles,
         "Forms": forms_titles,
@@ -80,34 +90,34 @@ def index(request):
 
 class ClientLoginView(View):
     def get(self, request):
-        pass
+        return redirect("/")
 
     def post(self, request):
         phone_number = request.POST.get("phone_number")
+        try:
+            phone_number_normalised = normalise_phone_number(phone_number)
+        except (ValidationError, NumberParseException):
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error_message": "⚠ Формат телефона нарушен",
+                }
+            )
 
-        user = authenticate(phone_number=phone_number)
-
-        if user:
-            login(request, user)
-        else:
-            try:
-                phone_number_normalised = normalise_phone_number(phone_number)
-            except (ValidationError, NumberParseException):
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "error_message": "⚠ Формат телефона нарушен",
-                    }
-                )
+        username = f"user{str(phone_number_normalised).replace('+', '_')}"
+        user, _ = ClientUser.objects.get_or_create(
+            phone_number=phone_number_normalised,
+            defaults={"username": username},
+        )
+        login(request, user)
 
         return JsonResponse({"success": True})
-
 
 
 class ClientLogoutView(View):
     def get(self, request):
         logout(request)
-        return
+        return redirect("/")
 
 
 class ClientProfileView(View):
