@@ -110,3 +110,6 @@ if CSRF_TRUSTED_ORIGINS != ["http://localhost"]:
     SECURE_SSL_REDIRECT = True
 
 # DEFAULT_FROM_EMAIL = "webmaster@localhost" # For reset password functionality
+
+YOOKASSA_SHOP_ID = env('YOOKASSA_SHOP_ID')
+YOOKASSA_SECRET_KEY = env('YOOKASSA_SECRET_KEY')

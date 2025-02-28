@@ -176,7 +176,8 @@
                 </section>
     
                 <section class="row pt-header" id="step4" v-if="Designed">
-                    <form class="d-none">
+                    <form class="d-none" action="{% url 'index' %}" method="post" >
+                        {% csrf_token %}
                         <input v-model="Levels" value="1" type="radio" name="LEVELS">
                         <input v-model="Levels" value="2" type="radio" name="LEVELS">
                         <input v-model="Levels" value="3" type="radio" name="LEVELS">
@@ -216,6 +217,7 @@
                         <input v-model="Time" type="time" name="TIME">
                         <input v-model="DelivComments" type="text" name="DELIVCOMMENTS">
                         <button type="submit" ref="HiddenFormSubmit">Submit Order</button>
+
                     </form>
                     <v-form :validation-schema="schema2" @submit="this.$refs.HiddenFormSubmit.click()">
                         <div class="col">
@@ -297,8 +299,9 @@
                                     <div class="d-flex">
                                         <span class="cake_pink fs_40 fw-bold me-2">Итого: {{ Cost }}₽</span>
                                     </div>
-                                    
-                                    <button type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">К оплате</button>
+                                        
+                                        <button type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">К оплате</button>
+                                    </form>>    
                                 </div>
                             </div>
                         </div>

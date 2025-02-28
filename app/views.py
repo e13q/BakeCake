@@ -13,6 +13,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views import View
 from phonenumbers import NumberParseException
+from yookassa import Configuration, Payment
 
 from .models import (
     Berry,
@@ -25,6 +26,9 @@ from .models import (
     Order,
     Topping,
 )
+
+
+Configuration.configure(settings.YOOKASSA_SHOP_ID, settings.YOOKASSA_SECRET_KEY)
 
 
 def normalise_phone_number(pn):
@@ -82,6 +86,23 @@ def index(request):
         "Decors": decors_titles,
     }
     context.update({"data_json": json.dumps(data)})
+
+    if request.method == 'POST':
+        payment = Payment.create({
+                    "amount": {
+                        "value": "200",
+                        "currency": "RUB"
+                    },
+                    "confirmation": {
+                        "type": "redirect",
+                        "return_url": request.build_absolute_uri('/')
+                    },
+                    "capture": True,
+                    "description": "Заказ прошел",
+                    "test": True,
+                })
+        return redirect(payment.confirmation.confirmation_url)
+
     return render(request, "index.html", context)
 
 
