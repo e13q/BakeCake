@@ -1,7 +1,7 @@
 import random
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from app.models import CustomUser, Client, Form, Level, Topping, Berry, Decor, Cake, Invoice, Order
+from app.models import ClientUser, Form, Level, Topping, Berry, Decor, Cake, Invoice, Order
 
 
 class Command(BaseCommand):
@@ -10,32 +10,27 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         with transaction.atomic():
             # Создание клиентов
-            user1 = CustomUser.objects.create_user(
-                email="user1@example.com", password="password123", username="user1"
-            )
-            user2 = CustomUser.objects.create_user(
-                email="user2@example.com", password="password123", username="user2"
-            )
-            user3 = CustomUser.objects.create_user(
-                email="user3@example.com", password="password123", username="VALERA"
-            )
-
-            clients = []
-            clients.append(Client.objects.create(
+            ClientUser.objects.create_user(
+                email="user1@example.com",
                 full_name="Иван Иванов",
-                user=user1,
-                phone_number="+79161112233"
-            ))
-            clients.append(Client.objects.create(
+                phone_number="+79161112233",
+                password="password123",
+                username="user1"
+            )
+            ClientUser.objects.create_user(
+                email="user2@example.com",
                 full_name="Петр Петров",
-                user=user2,
-                phone_number="+79162223344"
-            ))
-            clients.append(Client.objects.create(
+                phone_number="+79162223344",
+                password="password123",
+                username="user2"
+            )
+            ClientUser.objects.create_user(
+                email="user3@example.com",
                 full_name="Валерий",
-                user=user3,
-                phone_number="+79162223324"
-            ))
+                phone_number="+79162223324",
+                password="password123",
+                username="VALERA"
+            )
             # Создание уровней
             Level.objects.create(title="1 уровень", price=400)
             Level.objects.create(title="2 уровня", price=750)
@@ -139,7 +134,7 @@ class Command(BaseCommand):
             ]
             # Создание заказов
             cakes = Cake.objects.all()
-            clients = list(Client.objects.all())
+            clients = list(ClientUser.objects.all())
             
             invoice_statuses = [1, 2, 3, 4]
             order_statuses = [1, 2, 3]
