@@ -1,0 +1,206 @@
+from django import forms
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
+from django.core.mail import send_mail
+from django.db import transaction
+from django.utils import timezone
+from django.utils.crypto import get_random_string
+from phonenumber_field.formfields import PhoneNumberField
+
+from .models import Cake, ClientUser, Order, Level, Form, Topping, Berry, Decor, Invoice
+
+
+class OrderForm(forms.Form):
+    level = forms.CharField(
+        max_length=200,
+        required=True,
+        error_messages={
+            "required": "Нужно выбрать уровни.",
+        },
+    )
+    form = forms.CharField(
+        max_length=200,
+        required=True,
+        error_messages={
+            "required": "Нужно выбрать форму.",
+        },
+    )
+    topping = forms.CharField(
+        max_length=200,
+        required=True,
+        error_messages={
+            "required": "Нужно выбрать топпинг.",
+        },
+    )
+    berry = forms.CharField(max_length=200, required=False)
+    decor = forms.CharField(max_length=200, required=False)
+    words = forms.CharField(max_length=200, required=False)
+    order_comment = forms.CharField(max_length=200, required=False)
+    # NAME
+    full_name = forms.CharField(
+        label="",
+        max_length=200,
+        required=True,
+        error_messages={
+            "required": "Поле 'ФИО' обязательно для заполнения.",
+            "invalid": "Ну и что ты тут умудрился написать?",
+        },
+    )
+    # EMAIL
+    email = forms.EmailField(
+        label="",
+        max_length=255,
+        required=True,
+        error_messages={
+            "required": "Поле 'Email' обязательно для заполнения.",
+            "invalid": "Введите корректный email-адрес.",
+        },
+    )
+    # PHONE
+    phone_number = PhoneNumberField(
+        label="",
+        region="RU",
+        required=True,
+        error_messages={
+            "invalid": "Введите правильный номер телефона в формате +7 (___) ___-__-__.",
+            "required": "Поле 'Номер телефона' обязательно для заполнения.",
+        },
+    )
+    # ADDRESS
+    address = forms.CharField(
+        label="",
+        max_length=200,
+        required=True,
+        error_messages={
+            "required": "Укажите откуда забирать вещи.",
+        },
+    )
+    # DATE
+    order_date = forms.DateField(
+        label="Дата начала аренды",
+        required=True,
+        error_messages={
+            "required": "Укажите дату заказа",
+        },
+    )
+    order_time = forms.TimeField(
+        label="Время начала аренды",
+        required=True,
+        error_messages={
+            "required": "Укажите время заказа",
+        },
+    )
+    delivery_comment = forms.CharField(max_length=200, required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        order_date = cleaned_data.get("order_date")
+        email = cleaned_data.get("email")
+        now = timezone.now().date()
+        if order_date and order_date < now:
+            self.add_error("order_date", "Дата заказа должна быть актуальной.")
+
+        user = ClientUser.objects.filter(email=email).first()
+        if user and (self.user is None or self.user.is_anonymous):
+            self.add_error(
+                "email",
+                "Для указанного email существует учётная запись. Авторизуйтесь.",
+            )
+        if (
+            user
+            and self.user
+            and self.user.is_authenticated
+            and self.user.email != user.email
+        ):
+            self.add_error(
+                "email",
+                "Для указанного email существует учётная запись. Авторизуйтесь под иной учётной записью.",
+            )
+        return cleaned_data
+
+    # def __init__(self, *args, **kwargs):
+    #     self.user = kwargs.pop("user", None)
+    #     super().__init__(*args, **kwargs)
+    #     if self.user and self.user.is_authenticated:
+    #         client = ClientUser.objects.filter(user=self.user).first()
+    #         if client:
+    #             if client.full_name:
+    #                 self.fields["full_name"].initial = client.full_name
+    #             if client.user.email:
+    #                 self.fields["email"].initial = client.user.email
+    #             if client.phone_number:
+    #                 self.fields["phone_number"].initial = client.phone_number
+
+    def save(self):
+        with transaction.atomic():
+            data = self.cleaned_data
+
+            # Клиент
+            client, client_created = ClientUser.objects.get_or_create(
+                email=data["email"],
+                defaults={
+                    "full_name": data["full_name"],
+                    "phone_number": data["phone_number"],
+                },
+            )
+            if client_created:
+                username = get_random_string(length=8)
+                while not ClientUser.objects.filter(username=username).first() is None:
+                    username = get_random_string(length=8)
+                client.username = username
+                password = get_random_string(length=12)
+                client.password = make_password(password)
+                client.set_password(password)
+                client.save()
+                subject = "BakeCake| Пароль от учётной записи"
+                message = f"Здарова, {full_name}!\n\nУ тебя создана учётная запись в рамках формирования заказа {order.id}.\nИспользуй для входа:\nE-mail: {user.email}\nПароль: {password}\n\nВсего хорошего :)\n\nSelfStorage service"
+                from_email = settings.EMAIL_HOST_USER
+                recipient_list = [email]
+                send_mail(subject, message, from_email, recipient_list)
+
+            # Торт
+            price = 0 if data["words"] != "" else 500
+            level = Level.objects.get_object_or_404(title=data["level"])
+            form = Form.objects.get_object_or_404(title=data["form"])
+            topping = Topping.objects.get_object_or_404(title=data["topping"])
+            price += level.price + form.price + topping.price
+            if data["berry"] != "":
+                berry = Berry.objects.get_object_or_404(title=data["berry"])
+                price += berry.price
+            else:
+                berry = None
+            if data["decor"] != "":
+                decor = Decor.objects.get_object_or_404(title=data["decor"])
+                price += decor.price
+            else:
+                decor = None
+            cake = Cake.objects.create(
+                level=level,
+                form=form,
+                topping=topping,
+                berry=berry,
+                decor=decor,
+                price=price,
+                caption=data["words"],
+            )
+
+            # Чек
+            invoice = Invoice.objects.create(amount=cake.price)
+
+            # Заказ
+            order, order_created = Order.objects.get_or_create(
+                client=client,
+                cake=cake,
+                invoice=invoice,
+                delivery_date=data["order_date"],
+                delivery_time=data["order_time"],
+                delivery_address=data["address"],
+                comment=data["delivery_comment"],
+            )
+            if order_created:
+                subject = "BakeCake| Сформирован заказ"
+                message = f"Приветствую, {full_name}!\n\nСформирован заказ №{order.id}:\nАдрес доставки: {order.address}\nБокс: {order.box.number}\nСклад: {order.box.storage.address.city}, {order.box.storage.address.street_address}\nДата начала аренды: {order.date}\nДата окончания аренды: {order.expiration}\n\nВсего хорошего :)\n\nSelfStorage service"
+                from_email = settings.EMAIL_HOST_USER
+                recipient_list = [email]
+                send_mail(subject, message, from_email, recipient_list)
+            return order

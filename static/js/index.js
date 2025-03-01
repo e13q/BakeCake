@@ -122,6 +122,48 @@ Vue.createApp({
         ToStep4() {
             this.Designed = true
             setTimeout(() => this.$refs.ToStep4.click(), 0);
+        },
+        submitForm() {
+            $.ajax({
+                url: '/create-order/',
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val(),
+                    level: this.DATA.Levels[this.Levels],
+                    form: this.DATA.Forms[this.Form],
+                    topping: this.DATA.Toppings[this.Topping],
+                    berry: this.Berries == 0 ? "" : this.DATA.Berries[this.Berries],
+                    decor: this.Decor == 0 ? "" : this.DATA.Decors[this.Decor],
+                    words: this.Words,
+                    order_comment: this.Comments,
+                    full_name: this.Name,
+                    email: this.Email,
+                    phone_number: this.Phone,
+                    address: this.Address,
+                    order_date: this.Dates,
+                    order_time: this.Time,
+                    delivery_comment: this.DelivComments
+                },
+                success: function (response) {                
+                    // $("#loadingOverlay").hide();
+                    if (response.success) {
+                        alert(response.message);
+                    } else {
+                        for (let field in response.errors) {
+                            debugger
+                            // let input = this.$refs[field];
+                            // let errors = response.errors[field];
+                            // let errorList = $("<ul>").addClass("errorlist");
+                            // errors.forEach(error => errorList.append($("<li>").text(error)));
+                            // input.after(errorList);
+                          }
+                    }
+                }.bind(this),
+                error: function (xhr, status, error) {                
+                    // $("#loadingOverlay").hide();
+                    alert("Произошла ошибка: " + error);
+                }
+              });
         }
     },
     computed: {

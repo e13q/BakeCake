@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
-from django.db.models import Count, Min, Q
+from django.db import transaction
 from django.db.utils import IntegrityError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -27,6 +27,7 @@ from .models import (
     Topping,
 )
 
+from .forms import OrderForm
 
 Configuration.configure(settings.YOOKASSA_SHOP_ID, settings.YOOKASSA_SECRET_KEY)
 
@@ -104,6 +105,24 @@ def index(request):
         return redirect(payment.confirmation.confirmation_url)
 
     return render(request, "index.html", context)
+
+
+def create_order(request):
+    if request.method == "POST":
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": "Заказ успешно создан! Проверьте почту.",
+                }
+            )
+        else:
+            return JsonResponse({"success": False, "errors": form.errors})
+    return JsonResponse(
+        {"success": False, "message": "Неверный метод запроса"}
+    )
 
 
 class ClientLoginView(View):

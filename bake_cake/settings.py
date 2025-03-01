@@ -99,14 +99,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CSRF_TRUSTED_ORIGINS = env.str(
-    "CSRF_TRUSTED_ORIGINS", default="http://localhost"
-).split(",")
-if CSRF_TRUSTED_ORIGINS != ["http://localhost"]:
-    SECURE_PROXY_SSL_HEADER = CSRF_TRUSTED_ORIGINS and (
-        "HTTP_X_FORWARDED_PROTO",
-        "https",
-    )
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = env.str("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = env.int("EMAIL_PORT", 587)
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", True)
+EMAIL_HOST_USER = env.str("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD")
+CSRF_TRUSTED_ORIGINS = env.str('CSRF_TRUSTED_ORIGINS', default='http://localhost').split(',')
+if CSRF_TRUSTED_ORIGINS != ['http://localhost']:
+    SECURE_PROXY_SSL_HEADER = CSRF_TRUSTED_ORIGINS and ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
 
 # DEFAULT_FROM_EMAIL = "webmaster@localhost" # For reset password functionality

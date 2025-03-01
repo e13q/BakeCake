@@ -175,49 +175,39 @@
                     </v-form>
                 </section>
     
-                <section class="row pt-header" id="step4" v-if="Designed">
-                    <form class="d-none" action="{% url 'index' %}" method="post" >
+                <section class="row pt-header" id="step4" v-if="Designed">                    
+                    <form class="d-none" method="post" @submit.prevent="submitForm">
                         {% csrf_token %}
-                        <input v-model="Levels" value="1" type="radio" name="LEVELS">
-                        <input v-model="Levels" value="2" type="radio" name="LEVELS">
-                        <input v-model="Levels" value="3" type="radio" name="LEVELS">
+                        {% for level in levels %}
+                            <input ref="level" v-model="Levels" value="{{ level }}" type="radio" name="LEVELS">
+                        {% endfor %}
+                        <br>                        
+                        {% for form in forms %}
+                            <input ref="form" v-model="Form" value="{{ form }}" type="radio" name="FORM">
+                        {% endfor %}
                         <br>
-                        <input v-model="Form" value="1" type="radio" name="FORM">
-                        <input v-model="Form" value="2" type="radio" name="FORM">
-                        <input v-model="Form" value="3" type="radio" name="FORM">
+                        {% for topping in toppings %}
+                            <input ref="topping" v-model="Topping" value="{{ topping }}" type="radio" name="TOPPING">
+                        {% endfor %}
                         <br>
-                        <input v-model="Topping" value="1" type="radio" name="TOPPING">
-                        <input v-model="Topping" value="2" type="radio" name="TOPPING">
-                        <input v-model="Topping" value="3" type="radio" name="TOPPING">
-                        <input v-model="Topping" value="4" type="radio" name="TOPPING">
-                        <input v-model="Topping" value="5" type="radio" name="TOPPING">
-                        <input v-model="Topping" value="6" type="radio" name="TOPPING">
-                        <input v-model="Topping" value="7" type="radio" name="TOPPING">
+                        {% for berry in berries %}
+                            <input ref="berry" v-model="Berries" value="{{ berry }}" type="radio" name="BERRIES">
+                        {% endfor %}
                         <br>
-                        <input v-model="Berries" value="1" type="radio" name="BERRIES">
-                        <input v-model="Berries" value="2" type="radio" name="BERRIES">
-                        <input v-model="Berries" value="3" type="radio" name="BERRIES">
-                        <input v-model="Berries" value="4" type="radio" name="BERRIES">
+                        {% for decor in decors %}
+                            <input ref="decor" v-model="Decor" value="{{ decor }}" type="radio" name="DECOR">
+                        {% endfor %}
                         <br>
-                        <input v-model="Decor" value="1" type="radio" name="DECOR">
-                        <input v-model="Decor" value="2" type="radio" name="DECOR">
-                        <input v-model="Decor" value="3" type="radio" name="DECOR">
-                        <input v-model="Decor" value="4" type="radio" name="DECOR">
-                        <input v-model="Decor" value="5" type="radio" name="DECOR">
-                        <input v-model="Decor" value="6" type="radio" name="DECOR">
-                        <br>
-                        <input v-model="Words" type="text" name="WORDS">
-                        <input v-model="Comments" type="text" name="COMMENTS">
-    
-                        <input v-model="Name" type="text" name="NAME">
-                        <input v-model="Phone" type="tel" name="PHONE">
-                        <input v-model="Email" type="email" name="EMAIL">
-                        <input v-model="Address" type="text" name="ADDRESS">
-                        <input v-model="Dates" type="date" name="DATE">
-                        <input v-model="Time" type="time" name="TIME">
-                        <input v-model="DelivComments" type="text" name="DELIVCOMMENTS">
-                        <button type="submit" ref="HiddenFormSubmit">Submit Order</button>
-
+                        <input ref="words" v-model="Words" type="text" name="WORDS">
+                        <input ref="order_comment" v-model="Comments" type="text" name="COMMENTS">    
+                        <input ref="full_name" v-model="Name" type="text" name="NAME">
+                        <input ref="phone_number" v-model="Phone" type="tel" name="PHONE">
+                        <input ref="email" v-model="Email" type="email" name="EMAIL">
+                        <input ref="address" v-model="Address" type="text" name="ADDRESS">
+                        <input ref="order_date" v-model="Dates" type="date" name="DATE">
+                        <input ref="order_time" v-model="Time" type="time" name="TIME">
+                        <input ref="delivery_comment" v-model="DelivComments" type="text" name="DELIVCOMMENTS">
+                        <button type="submit" ref="HiddenFormSubmit">Submit Order</button>	           
                     </form>
                     <v-form :validation-schema="schema2" @submit="this.$refs.HiddenFormSubmit.click()">
                         <div class="col">
@@ -297,11 +287,12 @@
                                 </div>
                                 <div class="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-3 mt-md-0">
                                     <div class="d-flex">
+                                        {% verbatim %}
                                         <span class="cake_pink fs_40 fw-bold me-2">Итого: {{ Cost }}₽</span>
+                                        {% endverbatim %}
                                     </div>
-                                        
-                                        <button type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">К оплате</button>
-                                    </form>>    
+                                    <span class="text-center fw-light">Нажимая на кнопку, вы подтверждаете свое <a href="/static/documents/approval.pdf" class="link-dark">согласие на обработку персональных данных</a></span>
+                                    <button type="submit" class="btn btn_hover text-white rounded-pill mt-3 px-5 shadow-none cake__button cake__bg_pink">К оплате</button>
                                 </div>
                             </div>
                         </div>
