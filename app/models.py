@@ -118,13 +118,13 @@ class Cake(models.Model):
 
 
 class Invoice(models.Model):
-    STATUS = [
-        (1, "Ожидает оплаты"),
-        (2, "Оплачено"),
-        (3, "Отменено"),
+    STATUSES = [
+        ("1", "Ожидает оплаты"),
+        ("2", "Оплачено"),
+        ("3", "Отменено"),
     ]
     status = models.CharField(
-        "Статус счета", max_length=14, choices=STATUS, default="waiting"
+        "Статус счета", max_length=14, choices=STATUSES, default="1"
     )
     receipt = models.URLField("Чек", blank=True, null=True)
     created_at = models.DateTimeField("Счёт выставлен", auto_now_add=True)
@@ -141,21 +141,27 @@ class Invoice(models.Model):
 
 class Order(models.Model):
     STATUSES = [
-        (1, "Принят"),
-        (2, "В доставке"),
-        (3, "Выполнен"),
-        (4, "Отменен"),
+        ("1", "Принят"),
+        ("2", "В доставке"),
+        ("3", "Выполнен"),
+        ("4", "Отменен"),
     ]
     status = models.CharField(
-        "Статус заказа", max_length=9, choices=STATUSES, default=1
+        "Статус заказа", max_length=9, choices=STATUSES, default="1"
     )
     date = models.DateField("Дата заказа", auto_now_add=True)
     time = models.TimeField("Время заказа", auto_now_add=True)
     client = models.ForeignKey(
-        ClientUser, on_delete=models.PROTECT, verbose_name="Клиент"
+        ClientUser,
+        on_delete=models.PROTECT,
+        related_name="orders",
+        verbose_name="Клиент",
     )
     cake = models.ForeignKey(
-        Cake, on_delete=models.PROTECT, verbose_name="Торт"
+        Cake,
+        on_delete=models.PROTECT,
+        related_name="orders",
+        verbose_name="Торт",
     )
     delivery_date = models.DateField("Дата доставки")
     delivery_time = models.TimeField("Время доставки")
@@ -176,7 +182,7 @@ class Order(models.Model):
     )
 
     def __str__(self) -> str:
-        return str(f"{self.client.full_name}")
+        return str(f"{self.id} {self.client.phone_number}")
 
     class Meta:
         verbose_name = "Заказ"

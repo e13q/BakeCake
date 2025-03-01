@@ -40,11 +40,53 @@
 					</div>
 				</form>
                 <h2 class="fs_40 cake_pink mt-5">Мои заказы</h2>
-                <span class="cake_grey">У вас еще нет заказов.</span>
-                <p class="cake_grey">Вы можете добавить торт из <a href="./index.html#step2" class="text-decoration-none cake_pink">Каталога</a> или <a href="./index.html#step3" class="text-decoration-none cake_pink">Создать свой</a>.</p>
-                <span class="cake_grey">Есть вопросы?</span>
-                <span class="cake_grey">Воспользуйтесь нашим <a href="https://vk.com/devmanorg" class="text-decoration-none cake_pink">чат-ботом</a>.</span>
-                <button class="btn text-white rounded-pill align-self-end px-5 mt-3 shadow-none cake__button cake__bg_pink">Выйти</button>
+				{% if client_orders %}
+					{% for order in client_orders %}
+						<section class="my-2">
+							<span class="cake_blue lk__order d-flex" data-bs-toggle="modal" data-bs-target="#OrderModal{{ order.order_id }}">
+							{% if order.status == 'Принят' or order.status == 'В доставке' %}
+								<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-clock-fill" viewBox="0 0 16 16">
+									<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+								</svg>
+							{% else %}
+								<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+									<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+								</svg>
+							{% endif %}
+								<span class="ms-1">#{{ order.order_id }} Торт №{{ order.cake_id }}</span>
+							</span>
+							<aside class="modal fade" id="OrderModal{{ order.order_id }}" tabindex="-1" aria-labelledby="ModalLabel{{ order.order_id }}" aria-hidden="true">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title cake_pink" id="ModalLabel{{ order.order_id }}">#{{ order.order_id }} Торт №{{ order.cake_id }}</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body">
+											<span class="cake_blue">Уровней: {{ order.level }}</span><br>
+											<span class="cake_blue">Форма: {{ order.form }}</span><br>
+											<span class="cake_blue">Топпинг: {{ order.topping }}</span><br>
+											<span class="cake_blue">Ягоды: {{ order.berry }}</span><br>
+											<span class="cake_blue">Декор: {{ order.decor }}</span><br>
+											<span class="cake_blue">{{ order.caption }}</span><br>
+											<span class="cake_pink">Цена: {{ order.price }}</span>
+										</div>
+										<div class="modal-footer d-flex justify-content-between">
+											<span class="cake_blue d-flex">Статус: {{ order.status }}</span>
+											<span class="cake_blue d-flex align-items-center">Время доставки: {{ order.delivery_date }} {{ order.delivery_time }}</span>
+										</div>
+									</div>
+								</div>
+							</aside>
+						</section>
+					{% endfor %}
+				{% else %}
+					<span class="cake_grey">У вас еще нет заказов.</span>
+					<p class="cake_grey">Вы можете добавить торт из <a href="/#step2" class="text-decoration-none cake_pink">Каталога</a> или <a href="/#step3" class="text-decoration-none cake_pink">Создать свой</a>.</p>
+					<span class="cake_grey">Есть вопросы?</span>
+					<span class="cake_grey">Воспользуйтесь нашим <a href="https://vk.com/devmanorg" class="text-decoration-none cake_pink">чат-ботом</a>.</span>
+					<a href="/logout/" class="btn text-white rounded-pill align-self-end px-5 mt-3 shadow-none cake__button cake__bg_pink">Выйти</a>
+				{% endif %}
             </div>
         </div>
     </div>

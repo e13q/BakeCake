@@ -29,7 +29,9 @@ from .models import (
 
 from .forms import OrderForm
 
-Configuration.configure(settings.YOOKASSA_SHOP_ID, settings.YOOKASSA_SECRET_KEY)
+Configuration.configure(
+    settings.YOOKASSA_SHOP_ID, settings.YOOKASSA_SECRET_KEY
+)
 
 
 def normalise_phone_number(pn):
@@ -88,20 +90,19 @@ def index(request):
     }
     context.update({"data_json": json.dumps(data)})
 
-    if request.method == 'POST':
-        payment = Payment.create({
-                    "amount": {
-                        "value": "200",
-                        "currency": "RUB"
-                    },
-                    "confirmation": {
-                        "type": "redirect",
-                        "return_url": request.build_absolute_uri('/')
-                    },
-                    "capture": True,
-                    "description": "Заказ прошел",
-                    "test": True,
-                })
+    if request.method == "POST":
+        payment = Payment.create(
+            {
+                "amount": {"value": "200", "currency": "RUB"},
+                "confirmation": {
+                    "type": "redirect",
+                    "return_url": request.build_absolute_uri("/"),
+                },
+                "capture": True,
+                "description": "Заказ прошел",
+                "test": True,
+            }
+        )
         return redirect(payment.confirmation.confirmation_url)
 
     return render(request, "index.html", context)
@@ -159,7 +160,46 @@ class ClientLogoutView(View):
 
 class ClientProfileView(View):
     def get(self, request):
-        return render(request, "lk.html")
+        user = request.user
+        orders = Order.objects.filter(client=user).select_related(
+            "cake",
+            "cake__level",
+            "cake__form",
+            "cake__topping",
+            "cake__berry",
+            "cake__decor",
+        )
+        client_orders = []
+
+        for order in orders:
+            client_orders.append(
+                {
+                    "order_id": order.id,
+                    "cake_id": order.cake.id,
+                    "level": order.cake.level.title,
+                    "form": order.cake.form.title,
+                    "topping": order.cake.topping.title,
+                    "berry": order.cake.berry.title
+                    if order.cake.berry
+                    else "нет",
+                    "decor": order.cake.decor.title
+                    if order.cake.decor
+                    else "нет",
+                    "caption": order.cake.caption
+                    if order.cake.caption
+                    else "Без надписи",
+                    "price": order.cake.price,
+                    "status": order.get_status_display(),
+                    "delivery_date": order.delivery_date,
+                    "delivery_time": order.delivery_time,
+                }
+            )
+
+        context = {
+            "client_orders": client_orders,
+        }
+
+        return render(request, "lk.html", context)
 
     def post(self, request):
         full_name = request.POST.get("full_name")
