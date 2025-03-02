@@ -232,3 +232,7 @@ class ClientProfileView(View):
             user.save()
 
         return JsonResponse({"success": True})
+
+
+def legal(request):
+    return render(request, "legal.html")
