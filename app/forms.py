@@ -1,14 +1,37 @@
 from django import forms
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from phonenumber_field.formfields import PhoneNumberField
 from django.shortcuts import get_object_or_404
+from yookassa import Payment
 
 from .models import Cake, ClientUser, Order, Level, Form, Topping, Berry, Decor, Invoice
+
+
+def create_payment(request, price):
+    payment = Payment.create(
+        {
+            "amount": {"value": price, "currency": "RUB"},
+            "confirmation": {
+                "type": "redirect",
+                "return_url": request.build_absolute_uri('/'),
+            },
+            "capture": True,
+            "description": "Заказ прошел",
+            "test": True,
+        }
+    )
+    return payment.id, payment.confirmation.confirmation_url
+
+
+def check_payment(id_payment):
+    payment = Payment.find_one(id_payment)
+    return payment.status
 
 
 class OrderForm(forms.Form):
@@ -138,6 +161,7 @@ class OrderForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
+        self.request = kwargs.pop('request', None)  # Извлекаем request из kwargs
         super().__init__(*args, **kwargs)
 
     def save(self):
@@ -170,9 +194,10 @@ class OrderForm(forms.Form):
                 price=price,
                 caption=data["words"],
             )
-
+            amount = cake.price
+            _, url = create_payment(self.request, amount)
             # Чек
-            invoice = Invoice.objects.create(amount=cake.price)
+            invoice = Invoice.objects.create(amount=amount, receipt=url)
 
             # Клиент
             client, client_created = ClientUser.objects.get_or_create(
@@ -211,4 +236,4 @@ class OrderForm(forms.Form):
                 from_email = settings.EMAIL_HOST_USER
                 recipient_list = [client.email]
                 send_mail(subject, message, from_email, recipient_list)
-            return order
+            return url

@@ -128,8 +128,6 @@ class Invoice(models.Model):
     created_at = models.DateTimeField("Счёт выставлен", auto_now_add=True)
     updated_at = models.DateTimeField("Последнее обновление", auto_now=True)
     amount = models.FloatField("Сумма чека")
-    payment_id = models.CharField(max_length=100, null=True, blank=True)
-
 
     def __str__(self) -> str:
         return f"{self.updated_at} {self.orders.first().client.full_name} {self.status}"

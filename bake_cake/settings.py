@@ -3,6 +3,7 @@ from pathlib import Path
 
 import dj_database_url
 from environs import Env
+from yookassa import Configuration
 
 env = Env()
 env.read_env()
@@ -119,3 +120,6 @@ if CSRF_TRUSTED_ORIGINS != ["http://localhost"]:
 
 YOOKASSA_SHOP_ID = env("YOOKASSA_SHOP_ID")
 YOOKASSA_SECRET_KEY = env("YOOKASSA_SECRET_KEY")
+
+
+Configuration.configure(YOOKASSA_SHOP_ID, YOOKASSA_SECRET_KEY)

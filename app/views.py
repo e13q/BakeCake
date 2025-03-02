@@ -1,35 +1,24 @@
 import json
 
 import phonenumbers as ph
-from django.conf import settings
-from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth import login, logout
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
-from django.db import transaction
-from django.db.utils import IntegrityError
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.template.loader import render_to_string
-from django.urls import reverse
+from django.shortcuts import redirect, render
 from django.views import View
 from phonenumbers import NumberParseException
-from yookassa import Configuration, Payment
 
 from .models import (
     Berry,
-    Cake,
     ClientUser,
     Decor,
     Form,
-    Invoice,
     Level,
     Order,
     Topping,
 )
 
 from .forms import OrderForm
-
-Configuration.configure(settings.YOOKASSA_SHOP_ID, settings.YOOKASSA_SECRET_KEY)
 
 
 def normalise_phone_number(pn):
@@ -98,57 +87,21 @@ def index(request):
         user_phone_number = ""
     user_data = {"Name": user_name, "Email": user_email, "Phone": user_phone_number}
     context.update({"user_json": json.dumps(user_data)})
-    if request.method == "POST":
-        payment = Payment.create(
-            {
-                "amount": {"value": "200", "currency": "RUB"},
-                "confirmation": {
-                    "type": "redirect",
-                    "return_url": request.build_absolute_uri("/"),
-                },
-                "capture": True,
-                "description": "Заказ прошел",
-                "test": True,
-            }
-        )
-        return redirect(payment.confirmation.confirmation_url)
 
     return render(request, "index.html", context)
 
 
-def create_payment(request, price):
-    payment = Payment.create({
-                    "amount": {
-                        "value": price,
-                        "currency": "RUB"
-                    },
-                    "confirmation": {
-                        "type": "redirect",
-                        "return_url": request.build_absolute_uri('/')
-                    },
-                    "capture": True,
-                    "description": "Заказ прошел",
-                    "test": True,
-                })
-    return payment.id, payment.confirmation.confirmation_url
-
-
-def check_payment(id_payment):
-    payment = Payment.find_one(id_payment)
-    return  payment.status
-
-
 def create_order(request):
     if request.method == "POST":
-        form = OrderForm(request.POST, user=request.user)
+        form = OrderForm(request.POST, user=request.user, request=request)
         if form.is_valid():
-            order = form.save()
-            payment_url = create_payment(request, order.invoice.amount)
-            # print(order)
-            # order.invoice.payment_id = payment_id
-            # order.invoice.save()
-
-            return redirect(payment_url)
+            url = form.save()
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": f'Заказ успешно создан! Оплати: {url}',
+                }
+            )
         else:
             return JsonResponse({"success": False, "errors": form.errors})
     return JsonResponse({"success": False, "message": "Неверный метод запроса"})
