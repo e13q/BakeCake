@@ -179,44 +179,44 @@
                     <form class="d-none" method="post" @submit.prevent="submitForm">
                         {% csrf_token %}
                         {% for level in levels %}
-                            <input ref="level" v-model="Levels" value="{{ level }}" type="radio" name="LEVELS">
+                            <input v-model="Levels" value="{{ level }}" type="radio" name="LEVELS">
                         {% endfor %}
                         <br>                        
                         {% for form in forms %}
-                            <input ref="form" v-model="Form" value="{{ form }}" type="radio" name="FORM">
+                            <input v-model="Form" value="{{ form }}" type="radio" name="FORM">
                         {% endfor %}
                         <br>
                         {% for topping in toppings %}
-                            <input ref="topping" v-model="Topping" value="{{ topping }}" type="radio" name="TOPPING">
+                            <input v-model="Topping" value="{{ topping }}" type="radio" name="TOPPING">
                         {% endfor %}
                         <br>
                         {% for berry in berries %}
-                            <input ref="berry" v-model="Berries" value="{{ berry }}" type="radio" name="BERRIES">
+                            <input v-model="Berries" value="{{ berry }}" type="radio" name="BERRIES">
                         {% endfor %}
                         <br>
                         {% for decor in decors %}
-                            <input ref="decor" v-model="Decor" value="{{ decor }}" type="radio" name="DECOR">
+                            <input v-model="Decor" value="{{ decor }}" type="radio" name="DECOR">
                         {% endfor %}
                         <br>
-                        <input ref="words" v-model="Words" type="text" name="WORDS">
-                        <input ref="order_comment" v-model="Comments" type="text" name="COMMENTS">    
-                        <input ref="full_name" v-model="Name" type="text" name="NAME">
-                        <input ref="phone_number" v-model="Phone" type="tel" name="PHONE">
-                        <input ref="email" v-model="Email" type="email" name="EMAIL">
-                        <input ref="address" v-model="Address" type="text" name="ADDRESS">
-                        <input ref="order_date" v-model="Dates" type="date" name="DATE">
-                        <input ref="order_time" v-model="Time" type="time" name="TIME">
-                        <input ref="delivery_comment" v-model="DelivComments" type="text" name="DELIVCOMMENTS">
+                        <input v-model="Words" type="text" name="WORDS">
+                        <input v-model="Comments" type="text" name="COMMENTS">    
+                        <input v-model="Name" type="text" name="NAME">
+                        <input v-model="Phone" type="tel" name="PHONE">
+                        <input v-model="Email" type="email" name="EMAIL">
+                        <input v-model="Address" type="text" name="ADDRESS">
+                        <input v-model="Dates" type="date" name="DATE">
+                        <input v-model="Time" type="time" name="TIME">
+                        <input v-model="DelivComments" type="text" name="DELIVCOMMENTS">
                         <button type="submit" ref="HiddenFormSubmit">Submit Order</button>	           
                     </form>
-                    <v-form :validation-schema="schema2" @submit="this.$refs.HiddenFormSubmit.click()">
+                    <v-form ref="form" :validation-schema="schema2" @submit="this.$refs.HiddenFormSubmit.click()">
                         <div class="col">
                             <div class="d-flex flex-column position-relative pb-5">
                                 <h2 class="fs_40 font_Gogh cake_blue text-center align-self-center">Оформление заказа</h2>
                                 <span class="cake_pink mt-2 position-absolute bottom-0">
                                     <error-message name="name" class="from__alert"></error-message>
                                     <error-message name="phone" class="from__alert"></error-message>
-                                    <error-message name="email" class="from__alert"></error-message>
+                                    <error-message name="email"></error-message>
                                 </span>
                             </div>
                             <div class="row">
@@ -229,12 +229,14 @@
                                     <div class="position-relative pb-1">
                                         <v-field v-model="Name" :class="Name ? 'cake__border_blue': ''" type="text" name="name" id="name" placeholder="Введите ваше имя" class="form-control my-3 cake__textinput"></v-field>
                                         <v-field v-model="Name" type="text" name="name_format" class="d-none"></v-field>
+                                        <error-message name="full_name" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
                                         <error-message name="name_format" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
                                     </div>
                                     <div class="position-relative pb-1">
                                         <v-field v-model="Phone" :class="Phone ? 'cake__border_blue': ''" type="tel" name="phone" id="phone" placeholder="Введите номер" class="form-control my-3 cake__textinput"></v-field>
                                         <v-field v-model="Phone" type="phone" name="phone_format" class="d-none"></v-field>
                                         <error-message name="phone_format" class="position-absolute bottom-0 cake_pink fs_12"></error-message>
+                                        <error-message name="phone_number" class="position-absolute bottom-0 cake_pink fs_12"></error-message>                                    
                                     </div>
                                     <div class="position-relative pb-1">
                                         <v-field v-model="Email" :class="Email ? 'cake__border_blue': ''" type="email" name="email" id="email" placeholder="Введите почту" class="form-control my-3 cake__textinput"></v-field>
@@ -263,8 +265,8 @@
                                 <h2 class="fs_40 cake_pink">Данные для доставки</h2>
                                 <span class="cake_pink mt-2 position-absolute bottom-0">
                                     <error-message name="address" class="from__alert"></error-message>
-                                    <error-message name="date" class="from__alert"></error-message>
-                                    <error-message name="time" class="from__alert"></error-message>
+                                    <error-message name="date" class="from__alert"></error-message>                                    
+                                    <error-message name="time" class="from__alert"></error-message>                         
                                 </span>
                             </div>
     
@@ -277,13 +279,16 @@
                                 <div class="col-6 col-lg-4 d-flex flex-column">
                                     <v-field v-model="Address" :class="Address ? 'cake__border_blue': ''" type="text" name="address" id="address" placeholder="Введите ваш адрес" class="form-control my-3 cake__textinput"></v-field>
                                     <v-field v-model="Dates" :class="Dates ? 'cake__border_blue': ''" type="date" name="date" id="date" placeholder="ДД.ММ.ГГ" class="form-control my-3 cake__textinput"></v-field>
+                                    <error-message name="order_date" class="cake_pink fs_12"></error-message>
                                     <v-field v-model="Time" :class="Time ? 'cake__border_blue': ''" type="time" name="time" id="time" placeholder="00:00" class="form-control my-3 cake__textinput"></v-field>
+                                    <error-message name="order_time" class="cake_pink fs_12"></error-message>
                                 </div>
                             </div>
                             <div class="row mt-3">
                                 <div class="col-12 col-md-6">
                                     <label for="deliv-comment" class="cake_blue">Комментарий для курьера</label>
                                     <textarea v-model="DelivComments" :class="DelivComments ? 'cake__border_blue': ''" id="deliv-comment" class="form-control cake__textinput mt-3" rows="2" style="resize: none"></textarea>
+                                    <error-message name="delivery_comment" class="cake_pink fs_12"></error-message>
                                 </div>
                                 <div class="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-3 mt-md-0">
                                     <div class="d-flex">

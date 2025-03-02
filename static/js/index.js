@@ -77,7 +77,7 @@ Vue.createApp({
                     if (value) {
                         return true;
                     }
-                    return ' почту';
+                    return '⚠ Необходимо указать почту';
                 },
                 address: (value) => {
                     if (value) {
@@ -115,7 +115,11 @@ Vue.createApp({
             Address: null,
             Dates: null,
             Time: null,
-            DelivComments: ''
+            DelivComments: '',
+            errors: {
+                order_date: []
+            },
+            errorsKey: 0
         }
     },
     methods: {
@@ -144,21 +148,20 @@ Vue.createApp({
                     order_time: this.Time,
                     delivery_comment: this.DelivComments
                 },
-                success: function (response) {                
+                success: (response) => {                
                     // $("#loadingOverlay").hide();
                     if (response.success) {
                         alert(response.message);
-                    } else {
-                        for (let field in response.errors) {
-                            debugger
-                            // let input = this.$refs[field];
-                            // let errors = response.errors[field];
-                            // let errorList = $("<ul>").addClass("errorlist");
-                            // errors.forEach(error => errorList.append($("<li>").text(error)));
-                            // input.after(errorList);
-                          }
+                        // Очистка ошибок при успешной отправке
+                        this.errors = {};
+                        }
+                    else {
+                        // Обработка ошибок
+                        this.$refs.form.setErrors(response.errors);
+                        debugger
+
                     }
-                }.bind(this),
+                },
                 error: function (xhr, status, error) {                
                     // $("#loadingOverlay").hide();
                     alert("Произошла ошибка: " + error);

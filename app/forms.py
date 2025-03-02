@@ -6,6 +6,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from phonenumber_field.formfields import PhoneNumberField
+from django.shortcuts import get_object_or_404
 
 from .models import Cake, ClientUser, Order, Level, Form, Topping, Berry, Decor, Invoice
 
@@ -135,34 +136,12 @@ class OrderForm(forms.Form):
         with transaction.atomic():
             data = self.cleaned_data
 
-            # Клиент
-            client, client_created = ClientUser.objects.get_or_create(
-                email=data["email"],
-                defaults={
-                    "full_name": data["full_name"],
-                    "phone_number": data["phone_number"],
-                },
-            )
-            if client_created:
-                username = get_random_string(length=8)
-                while not ClientUser.objects.filter(username=username).first() is None:
-                    username = get_random_string(length=8)
-                client.username = username
-                password = get_random_string(length=12)
-                client.password = make_password(password)
-                client.set_password(password)
-                client.save()
-                subject = "BakeCake| Пароль от учётной записи"
-                message = f"Здарова, {full_name}!\n\nУ тебя создана учётная запись в рамках формирования заказа {order.id}.\nИспользуй для входа:\nE-mail: {user.email}\nПароль: {password}\n\nВсего хорошего :)\n\nSelfStorage service"
-                from_email = settings.EMAIL_HOST_USER
-                recipient_list = [email]
-                send_mail(subject, message, from_email, recipient_list)
-
             # Торт
             price = 0 if data["words"] != "" else 500
-            level = Level.objects.get_object_or_404(title=data["level"])
-            form = Form.objects.get_object_or_404(title=data["form"])
-            topping = Topping.objects.get_object_or_404(title=data["topping"])
+
+            level = get_object_or_404(Level, title=data["level"])
+            form = get_object_or_404(Form, title=data["form"])
+            topping = get_object_or_404(Topping, title=data["topping"])
             price += level.price + form.price + topping.price
             if data["berry"] != "":
                 berry = Berry.objects.get_object_or_404(title=data["berry"])
@@ -187,6 +166,14 @@ class OrderForm(forms.Form):
             # Чек
             invoice = Invoice.objects.create(amount=cake.price)
 
+            # Клиент
+            client, client_created = ClientUser.objects.get_or_create(
+                email=data["email"],
+                defaults={
+                    "full_name": data["full_name"],
+                    "phone_number": data["phone_number"],
+                },
+            )
             # Заказ
             order, order_created = Order.objects.get_or_create(
                 client=client,
@@ -197,10 +184,25 @@ class OrderForm(forms.Form):
                 delivery_address=data["address"],
                 comment=data["delivery_comment"],
             )
+            if client_created:
+                username = get_random_string(length=8)
+                while not ClientUser.objects.filter(username=username).first() is None:
+                    username = get_random_string(length=8)
+                client.username = username
+                password = get_random_string(length=12)
+                client.password = make_password(password)
+                client.set_password(password)
+                client.save()
+                subject = "BakeCake| Пароль от учётной записи"
+                message = f"Здарова, {client.full_name}!\n\nУ тебя создана учётная запись в рамках формирования заказа {order.id}.\nИспользуй для входа:\nE-mail: {client.email}\nПароль: {password}\n\nВсего хорошего :)\n\nBakeCake service"
+                from_email = settings.EMAIL_HOST_USER
+                recipient_list = [client.email]
+                send_mail(subject, message, from_email, recipient_list)
+
             if order_created:
                 subject = "BakeCake| Сформирован заказ"
-                message = f"Приветствую, {full_name}!\n\nСформирован заказ №{order.id}:\nАдрес доставки: {order.address}\nБокс: {order.box.number}\nСклад: {order.box.storage.address.city}, {order.box.storage.address.street_address}\nДата начала аренды: {order.date}\nДата окончания аренды: {order.expiration}\n\nВсего хорошего :)\n\nSelfStorage service"
+                message = f"Приветствую, {client.full_name}!\n\nСформирован заказ №{order.id}:\nАдрес доставки: {order.delivery_address}\Торт: {order.cake.number}\n\nПланируемая дата доставки: {order.delivery_date} {order.delivery_time}\nДата окончания аренды: {order.expiration}\n\nВсего хорошего :)\n\nBakeCake service"
                 from_email = settings.EMAIL_HOST_USER
-                recipient_list = [email]
+                recipient_list = [client.email]
                 send_mail(subject, message, from_email, recipient_list)
             return order
