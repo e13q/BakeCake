@@ -32,9 +32,9 @@ class Command(BaseCommand):
                 username="VALERA"
             )
             # Создание уровней
-            Level.objects.create(title="1 уровень", price=400)
-            Level.objects.create(title="2 уровня", price=750)
-            Level.objects.create(title="3 уровня", price=1100)
+            Level.objects.create(title="1", price=400)
+            Level.objects.create(title="2", price=750)
+            Level.objects.create(title="3", price=1100)
 
             # Создание форм
             Form.objects.create(title="Круг", price=600)
