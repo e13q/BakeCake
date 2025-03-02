@@ -89,7 +89,21 @@ def index(request):
         "Decors": decors_titles,
     }
     context.update({"data_json": json.dumps(data)})
-
+    user = request.user
+    if user.is_authenticated:
+        user_name = user.username
+        user_email = user.email
+        user_phone_number = user.phone_number.as_e164
+    else:
+        user_name = ""
+        user_email = ""
+        user_phone_number = ""
+    user_data = {
+        "Name": user_name,
+        "Email": user_email,
+        "Phone": user_phone_number
+    }
+    context.update({"user_json": json.dumps(user_data)})
     if request.method == "POST":
         payment = Payment.create(
             {
@@ -110,7 +124,7 @@ def index(request):
 
 def create_order(request):
     if request.method == "POST":
-        form = OrderForm(request.POST)
+        form = OrderForm(request.POST, user=request.user)
         if form.is_valid():
             form.save()
             return JsonResponse(

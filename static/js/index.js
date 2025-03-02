@@ -108,10 +108,9 @@ Vue.createApp({
             Words: '',
             Comments: '',
             Designed: false,
-
-            Name: '',
-            Phone: null,
-            Email: null,
+            Name: USER.Name,
+            Email: USER.Email,
+            Phone: USER.Phone,            
             Address: null,
             Dates: null,
             Time: null,
@@ -123,7 +122,7 @@ Vue.createApp({
         }
     },
     methods: {
-        ToStep4() {
+        ToStep4() { 
             this.Designed = true
             setTimeout(() => this.$refs.ToStep4.click(), 0);
         },
@@ -152,13 +151,10 @@ Vue.createApp({
                     // $("#loadingOverlay").hide();
                     if (response.success) {
                         alert(response.message);
-                        // Очистка ошибок при успешной отправке
                         this.errors = {};
                         }
                     else {
-                        // Обработка ошибок
                         this.$refs.form.setErrors(response.errors);
-                        debugger
 
                     }
                 },

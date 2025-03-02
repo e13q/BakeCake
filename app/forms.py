@@ -115,9 +115,30 @@ class OrderForm(forms.Form):
         ):
             self.add_error(
                 "email",
-                "Для указанного email существует учётная запись. Авторизуйтесь под иной учётной записью.",
+                "Вы уже авторизованы под другой УЗ. Авторизуйтесь под иной учётной записью.",
+            )
+        phone_number = cleaned_data.get("phone_number")
+        user = ClientUser.objects.filter(phone_number=phone_number).first()
+        if user and (self.user is None or self.user.is_anonymous):
+            self.add_error(
+                "phone_number",
+                "Для указанного phone_number существует учётная запись. Авторизуйтесь.",
+            )
+        if (
+            user
+            and self.user
+            and self.user.is_authenticated
+            and self.user.phone_number != user.phone_number
+        ):
+            self.add_error(
+                "phone_number",
+                "Вы уже авторизованы под другой УЗ. Авторизуйтесь под иной учётной записью.",
             )
         return cleaned_data
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
 
     # def __init__(self, *args, **kwargs):
     #     self.user = kwargs.pop("user", None)
@@ -169,10 +190,8 @@ class OrderForm(forms.Form):
             # Клиент
             client, client_created = ClientUser.objects.get_or_create(
                 email=data["email"],
-                defaults={
-                    "full_name": data["full_name"],
-                    "phone_number": data["phone_number"],
-                },
+                phone_number=data["phone_number"],
+                defaults={"full_name": data["full_name"]},
             )
             # Заказ
             order, order_created = Order.objects.get_or_create(
