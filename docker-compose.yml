@@ -1,0 +1,35 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DJANGO_SETTINGS_MODULE=bake_cake.settings
+    volumes:
+      - staticfiles_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      - db
+  db:
+   image: postgres:15
+   volumes:
+     - db_data:/var/lib/postgresql/data
+
+volumes:
+  staticfiles_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /var/www/staticfiles/
+  media_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /var/www/media/
+  db_data:
+    driver_opts:
+      o: bind
+      type: none
+      device: /var/www/db_data
