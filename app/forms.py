@@ -145,19 +145,19 @@ class OrderForm(forms.Form):
             data = self.cleaned_data
 
             # Торт
-            price = 0 if data["words"] != "" else 500
+            price = 0 if data["words"] == "" else 500
 
             level = get_object_or_404(Level, title=data["level"])
             form = get_object_or_404(Form, title=data["form"])
             topping = get_object_or_404(Topping, title=data["topping"])
             price += level.price + form.price + topping.price
             if data["berry"] != "":
-                berry = Berry.objects.get_object_or_404(title=data["berry"])
+                berry = get_object_or_404(Berry, title=data["berry"])
                 price += berry.price
             else:
                 berry = None
             if data["decor"] != "":
-                decor = Decor.objects.get_object_or_404(title=data["decor"])
+                decor = get_object_or_404(Decor, title=data["decor"])
                 price += decor.price
             else:
                 decor = None
