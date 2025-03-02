@@ -1,3 +1,12 @@
+function showModal(message) {
+    document.getElementById('modal-message').innerHTML = message; // Вставляем HTML в модальное окно
+    document.getElementById('myModal').style.display = "block"; // Показываем модальное окно
+}
+
+document.querySelector(".close").onclick = function() {
+    document.getElementById('myModal').style.display = "none";
+}
+
 Vue.createApp({
     name: "App",
     components: {
@@ -151,7 +160,7 @@ Vue.createApp({
                 success: (response) => {                
                     $("#loadingOverlay").hide();
                     if (response.success) {
-                        alert(response.message);
+                        showModal(response.message);
                         this.errors = {};
                         }
                     else {

@@ -99,7 +99,7 @@ def create_order(request):
             return JsonResponse(
                 {
                     "success": True,
-                    "message": f'Заказ успешно создан! Оплати: {url}',
+                    "message": f'Заказ успешно создан! <p> <a href="{url}" target="_blank">Плати</a>',
                 }
             )
         else:
