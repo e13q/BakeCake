@@ -68,8 +68,12 @@
 											<span class="cake_blue">Топпинг: {{ order.topping }}</span><br>
 											<span class="cake_blue">Ягоды: {{ order.berry }}</span><br>
 											<span class="cake_blue">Декор: {{ order.decor }}</span><br>
-											<span class="cake_blue">{{ order.caption }}</span><br>
-											<span class="cake_pink">Цена: {{ order.price }}</span>
+											<span class="cake_blue">Надпись: {{ order.caption }}</span><br>
+											<span class="cake_blue">Цена: {{ order.price }}</span><br>						
+											<span class="cake_blue">Оплата: {{ order.invoice.get_status_display }}</span><br>								
+											{% if order.invoice.get_status_display == 'Ожидает оплаты'%}
+												<span><a href="{{ order.invoice.receipt }}" class="cake_link">Оплати</a></span><br>
+											{% endif %}
 										</div>
 										<div class="modal-footer d-flex justify-content-between">
 											<span class="cake_blue d-flex">Статус: {{ order.status }}</span>

@@ -167,6 +167,7 @@ class ClientProfileView(View):
                     else "Без надписи",
                     "price": order.cake.price,
                     "status": order.get_status_display(),
+                    "invoice": order.invoice,
                     "delivery_date": order.delivery_date,
                     "delivery_time": order.delivery_time,
                 }

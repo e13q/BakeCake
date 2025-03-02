@@ -3,7 +3,7 @@ function showModal(message) {
     document.getElementById('myModal').style.display = "block"; // Показываем модальное окно
 }
 
-document.querySelector(".close").onclick = function() {
+document.querySelector(".extra_close").onclick = function() {
     document.getElementById('myModal').style.display = "none";
 }
 
