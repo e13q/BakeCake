@@ -135,23 +135,10 @@ class OrderForm(forms.Form):
                 "Вы уже авторизованы под другой УЗ. Авторизуйтесь под иной учётной записью.",
             )
         return cleaned_data
-    
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
-        super().__init__(*args, **kwargs)
 
-    # def __init__(self, *args, **kwargs):
-    #     self.user = kwargs.pop("user", None)
-    #     super().__init__(*args, **kwargs)
-    #     if self.user and self.user.is_authenticated:
-    #         client = ClientUser.objects.filter(user=self.user).first()
-    #         if client:
-    #             if client.full_name:
-    #                 self.fields["full_name"].initial = client.full_name
-    #             if client.user.email:
-    #                 self.fields["email"].initial = client.user.email
-    #             if client.phone_number:
-    #                 self.fields["phone_number"].initial = client.phone_number
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
 
     def save(self):
         with transaction.atomic():

@@ -85,9 +85,7 @@ class Cake(models.Model):
         on_delete=models.PROTECT,
         verbose_name="Количество уровней торта",
     )
-    form = models.ForeignKey(
-        Form, on_delete=models.PROTECT, verbose_name="Форма торта"
-    )
+    form = models.ForeignKey(Form, on_delete=models.PROTECT, verbose_name="Форма торта")
     topping = models.ForeignKey(
         Topping, on_delete=models.PROTECT, verbose_name="Топпинг"
     )

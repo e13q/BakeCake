@@ -29,9 +29,7 @@ from .models import (
 
 from .forms import OrderForm
 
-Configuration.configure(
-    settings.YOOKASSA_SHOP_ID, settings.YOOKASSA_SECRET_KEY
-)
+Configuration.configure(settings.YOOKASSA_SHOP_ID, settings.YOOKASSA_SECRET_KEY)
 
 
 def normalise_phone_number(pn):
@@ -98,11 +96,7 @@ def index(request):
         user_name = ""
         user_email = ""
         user_phone_number = ""
-    user_data = {
-        "Name": user_name,
-        "Email": user_email,
-        "Phone": user_phone_number
-    }
+    user_data = {"Name": user_name, "Email": user_email, "Phone": user_phone_number}
     context.update({"user_json": json.dumps(user_data)})
     if request.method == "POST":
         payment = Payment.create(
@@ -135,9 +129,7 @@ def create_order(request):
             )
         else:
             return JsonResponse({"success": False, "errors": form.errors})
-    return JsonResponse(
-        {"success": False, "message": "Неверный метод запроса"}
-    )
+    return JsonResponse({"success": False, "message": "Неверный метод запроса"})
 
 
 class ClientLoginView(View):
@@ -193,12 +185,8 @@ class ClientProfileView(View):
                     "level": order.cake.level.title,
                     "form": order.cake.form.title,
                     "topping": order.cake.topping.title,
-                    "berry": order.cake.berry.title
-                    if order.cake.berry
-                    else "нет",
-                    "decor": order.cake.decor.title
-                    if order.cake.decor
-                    else "нет",
+                    "berry": order.cake.berry.title if order.cake.berry else "нет",
+                    "decor": order.cake.decor.title if order.cake.decor else "нет",
                     "caption": order.cake.caption
                     if order.cake.caption
                     else "Без надписи",
