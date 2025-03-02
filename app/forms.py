@@ -194,14 +194,14 @@ class OrderForm(forms.Form):
                 client.set_password(password)
                 client.save()
                 subject = "BakeCake| Пароль от учётной записи"
-                message = f"Здарова, {client.full_name}!\n\nУ тебя создана учётная запись в рамках формирования заказа {order.id}.\nИспользуй для входа:\nE-mail: {client.email}\nПароль: {password}\n\nВсего хорошего :)\n\nBakeCake service"
+                message = f"Здарова, {client.full_name}!\n\nУ тебя создана учётная запись в рамках формирования заказа {order.id}.\nИспользуй для входа:\nE-mail: {client.phone_number}\nПароль: {password}\n\nВсего хорошего :)\n\nBakeCake service"
                 from_email = settings.EMAIL_HOST_USER
                 recipient_list = [client.email]
                 send_mail(subject, message, from_email, recipient_list)
 
             if order_created:
                 subject = "BakeCake| Сформирован заказ"
-                message = f"Приветствую, {client.full_name}!\n\nСформирован заказ №{order.id}:\nАдрес доставки: {order.delivery_address}\Торт: {order.cake.number}\n\nПланируемая дата доставки: {order.delivery_date} {order.delivery_time}\nДата окончания аренды: {order.expiration}\n\nВсего хорошего :)\n\nBakeCake service"
+                message = f"Приветствую, {client.full_name}!\n\nСформирован заказ №{order.id}:\nАдрес доставки: {order.delivery_address}\nСостав торта\nУровни: {order.cake.level}\nФорма: {order.cake.form}\nТоппинг: {order.cake.topping}\nЯгоды: {order.cake.berry or 'отсутствуют'}\nДекор: {order.cake.decor or 'отсутствует'}\nНадпись: {order.cake.caption or 'отсутствует'}\n\nПланируемая дата доставки: {order.delivery_date} {order.delivery_time}\n\nВсего хорошего :)\n\nBakeCake service"
                 from_email = settings.EMAIL_HOST_USER
                 recipient_list = [client.email]
                 send_mail(subject, message, from_email, recipient_list)
