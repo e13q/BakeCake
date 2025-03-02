@@ -116,17 +116,39 @@ def index(request):
     return render(request, "index.html", context)
 
 
+def create_payment(request, price):
+    payment = Payment.create({
+                    "amount": {
+                        "value": price,
+                        "currency": "RUB"
+                    },
+                    "confirmation": {
+                        "type": "redirect",
+                        "return_url": request.build_absolute_uri('/')
+                    },
+                    "capture": True,
+                    "description": "Заказ прошел",
+                    "test": True,
+                })
+    return payment.id, payment.confirmation.confirmation_url
+
+
+def check_payment(id_payment):
+    payment = Payment.find_one(id_payment)
+    return  payment.status
+
+
 def create_order(request):
     if request.method == "POST":
         form = OrderForm(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
-            return JsonResponse(
-                {
-                    "success": True,
-                    "message": "Заказ успешно создан! Проверьте почту.",
-                }
-            )
+            order = form.save()
+            payment_url = create_payment(request, order.invoice.amount)
+            # print(order)
+            # order.invoice.payment_id = payment_id
+            # order.invoice.save()
+
+            return redirect(payment_url)
         else:
             return JsonResponse({"success": False, "errors": form.errors})
     return JsonResponse({"success": False, "message": "Неверный метод запроса"})
