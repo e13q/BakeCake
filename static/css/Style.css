@@ -133,3 +133,42 @@ li .cake__textinput:read-only {
 .z-index-1 {
     z-index: -1;
 }
+
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column; /* Элементы выстраиваются вертикально */
+    align-items: center; /* Центрирование по горизонтали */
+    text-align: center; /* Центрирование текста */
+  }
+  
+  .loading {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #3498db;
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 10px; /* Отступ между колесиком и текстом */
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }

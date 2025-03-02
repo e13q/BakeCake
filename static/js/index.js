@@ -126,7 +126,8 @@ Vue.createApp({
             this.Designed = true
             setTimeout(() => this.$refs.ToStep4.click(), 0);
         },
-        submitForm() {
+        submitForm() {               
+            $("#loadingOverlay").show();
             $.ajax({
                 url: '/create-order/',
                 method: 'POST',
@@ -148,7 +149,7 @@ Vue.createApp({
                     delivery_comment: this.DelivComments
                 },
                 success: (response) => {                
-                    // $("#loadingOverlay").hide();
+                    $("#loadingOverlay").hide();
                     if (response.success) {
                         alert(response.message);
                         this.errors = {};
@@ -159,7 +160,7 @@ Vue.createApp({
                     }
                 },
                 error: function (xhr, status, error) {                
-                    // $("#loadingOverlay").hide();
+                    $("#loadingOverlay").hide();
                     alert("Произошла ошибка: " + error);
                 }
               });
