@@ -201,17 +201,19 @@ class OrderForm(forms.Form):
             ).first()
 
             if not client:
-                client, client_created = ClientUser.objects.create(
+                client = ClientUser.objects.create(
                     email=data["email"],
                     phone_number=data["phone_number"],
                     full_name=data["full_name"],
                 )
                 client_created = True
             else:
+                client.email = data["email"]
+                client.phone_number = data["phone_number"]
+                client.save()
                 client_created = False
-
             # Заказ
-            order, order_created = Order.objects.get_or_create(
+            order = Order.objects.create(
                 client=client,
                 cake=cake,
                 invoice=invoice,
@@ -235,10 +237,9 @@ class OrderForm(forms.Form):
                 recipient_list = [client.email]
                 send_mail(subject, message, from_email, recipient_list)
 
-            if order_created:
-                subject = "BakeCake| Сформирован заказ"
-                message = f"Приветствую, {client.full_name}!\n\nСформирован заказ №{order.id}:\nАдрес доставки: {order.delivery_address}\nСостав торта\nУровни: {order.cake.level}\nФорма: {order.cake.form}\nТоппинг: {order.cake.topping}\nЯгоды: {order.cake.berry or 'отсутствуют'}\nДекор: {order.cake.decor or 'отсутствует'}\nНадпись: {order.cake.caption or 'отсутствует'}\n\nПланируемая дата доставки: {order.delivery_date} {order.delivery_time}\n\nВсего хорошего :)\n\nBakeCake service"
-                from_email = settings.EMAIL_HOST_USER
-                recipient_list = [client.email]
-                send_mail(subject, message, from_email, recipient_list)
+            subject = "BakeCake| Сформирован заказ"
+            message = f"Приветствую, {client.full_name}!\n\nСформирован заказ №{order.id}:\nАдрес доставки: {order.delivery_address}\nСостав торта\nУровни: {order.cake.level}\nФорма: {order.cake.form}\nТоппинг: {order.cake.topping}\nЯгоды: {order.cake.berry or 'отсутствуют'}\nДекор: {order.cake.decor or 'отсутствует'}\nНадпись: {order.cake.caption or 'отсутствует'}\n\nПланируемая дата доставки: {order.delivery_date} {order.delivery_time}\n\nВсего хорошего :)\n\nBakeCake service"
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [client.email]
+            send_mail(subject, message, from_email, recipient_list)
             return url
