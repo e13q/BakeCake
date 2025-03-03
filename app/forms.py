@@ -1,7 +1,6 @@
 from django import forms
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.db import transaction
 from django.utils import timezone
@@ -19,7 +18,7 @@ def create_payment(request, price):
             "amount": {"value": price, "currency": "RUB"},
             "confirmation": {
                 "type": "redirect",
-                "return_url": request.build_absolute_uri('/'),
+                "return_url": request.build_absolute_uri("/"),
             },
             "capture": True,
             "description": "Заказ прошел",
@@ -27,11 +26,6 @@ def create_payment(request, price):
         }
     )
     return payment.id, payment.confirmation.confirmation_url
-
-
-def check_payment(id_payment):
-    payment = Payment.find_one(id_payment)
-    return payment.status
 
 
 class OrderForm(forms.Form):
@@ -161,7 +155,7 @@ class OrderForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
-        self.request = kwargs.pop('request', None)  # Извлекаем request из kwargs
+        self.request = kwargs.pop("request", None)  # Извлекаем request из kwargs
         super().__init__(*args, **kwargs)
 
     def save(self):
@@ -195,16 +189,28 @@ class OrderForm(forms.Form):
                 caption=data["words"],
             )
             amount = cake.price
-            _, url = create_payment(self.request, amount)
+            yoomoney_id, url = create_payment(self.request, amount)
             # Чек
-            invoice = Invoice.objects.create(amount=amount, receipt=url)
-
-            # Клиент
-            client, client_created = ClientUser.objects.get_or_create(
-                email=data["email"],
-                phone_number=data["phone_number"],
-                defaults={"full_name": data["full_name"]},
+            invoice = Invoice.objects.create(
+                amount=amount, yoomoney_id=yoomoney_id, receipt=url
             )
+            # Клиент
+            from django.db.models import Q
+
+            client = ClientUser.objects.filter(
+                Q(email=data["email"]) | Q(phone_number=data["phone_number"])
+            ).first()
+
+            if not client:
+                client, client_created = ClientUser.objects.create(
+                    email=data["email"],
+                    phone_number=data["phone_number"],
+                    full_name=data["full_name"],
+                )
+                client_created = True
+            else:
+                client_created = False
+
             # Заказ
             order, order_created = Order.objects.get_or_create(
                 client=client,

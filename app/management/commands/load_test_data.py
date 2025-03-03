@@ -1,7 +1,17 @@
 import random
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from app.models import ClientUser, Form, Level, Topping, Berry, Decor, Cake, Invoice, Order
+from app.models import (
+    ClientUser,
+    Form,
+    Level,
+    Topping,
+    Berry,
+    Decor,
+    Cake,
+    Invoice,
+    Order,
+)
 
 
 class Command(BaseCommand):
@@ -15,21 +25,21 @@ class Command(BaseCommand):
                 full_name="Иван Иванов",
                 phone_number="+79161112233",
                 password="password123",
-                username="user1"
+                username="user1",
             )
             ClientUser.objects.create_user(
                 email="user2@example.com",
                 full_name="Петр Петров",
                 phone_number="+79162223344",
                 password="password123",
-                username="user2"
+                username="user2",
             )
             ClientUser.objects.create_user(
                 email="user3@example.com",
                 full_name="Валерий",
                 phone_number="+79162223324",
                 password="password123",
-                username="VALERA"
+                username="VALERA",
             )
             # Создание уровней
             Level.objects.create(title="1", price=400)
@@ -118,7 +128,7 @@ class Command(BaseCommand):
                 "Москва, Краснопресненская, 46, кв. 355",
                 "Люберцы, Октябрьский проспект, 101, кв. 123",
                 "Химки, Калинина, 4А, кв. 145",
-                "Одинцово, Маршала Жукова, 46, кв. 299"
+                "Одинцово, Маршала Жукова, 46, кв. 299",
             ]
             comments = [
                 "",
@@ -130,14 +140,14 @@ class Command(BaseCommand):
                 "",
                 "Не забудьте позвонить!",
                 "Ещё надо будет сигареты купить. Позвоните перед доставкой пж.",
-                "Набрать за час до приезда. В дверь постучать 3 раза"
+                "Набрать за час до приезда. В дверь постучать 3 раза",
             ]
             # Создание заказов
             cakes = Cake.objects.all()
             clients = list(ClientUser.objects.all())
-            
-            invoice_statuses = [1, 2, 3, 4]
-            order_statuses = [1, 2, 3]
+
+            invoice_statuses = ["2", "3"]
+            order_statuses = ["1", "2", "3"]
             for cake in cakes:
                 client = random.choice(clients)
                 address = random.choice(addresses)
@@ -148,18 +158,16 @@ class Command(BaseCommand):
                 hour = random.randint(9, 17)
                 minute = random.randint(1, 59)
                 time = f"{hour:02d}:{minute:02d}"
-                delivery_date = f"2025-03-{day+1:02d}"
+                delivery_date = f"2025-03-{day + 1:02d}"
                 delivery_time = f"{hour:02d}:00"
 
                 invoice_status = random.choice(invoice_statuses)
                 invoice = Invoice.objects.create(
-                    status=invoice_status,
-                    receipt=receipt,
-                    amount=cake.price
+                    status=invoice_status, receipt=receipt, amount=cake.price
                 )
                 order_status = random.choice(order_statuses)
-                if invoice_status == 3:
-                    order_status = 4    
+                if invoice_status == "3":
+                    order_status = "4"
                 Order.objects.create(
                     status=order_status,
                     date=date,
@@ -170,7 +178,7 @@ class Command(BaseCommand):
                     delivery_time=delivery_time,
                     delivery_address=address,
                     invoice=invoice,
-                    comment=random.choice(comments)
+                    comment=random.choice(comments),
                 )
             self.stdout.write(
                 self.style.SUCCESS("Тестовые данные успешно загружены в бд")
