@@ -9,7 +9,7 @@ def is_shorten_url(url):
 
 def get_shortened_link(url):
     token = settings.VK_API_TOKEN
-    payload = {'v': '5.236', 'access_token': token, 'url': url}
+    payload = {'v': '5.199', 'access_token': token, 'url': url}
     response = get(
         'https://api.vk.ru/method/utils.getShortLink',
         params=payload

@@ -9,6 +9,7 @@ from django.utils.crypto import get_random_string
 from phonenumber_field.formfields import PhoneNumberField
 from django.shortcuts import get_object_or_404
 from yookassa import Payment
+from datetime import datetime, timedelta
 
 from .models import Cake, ClientUser, Order, Level, Form, Topping, Berry, Decor, Invoice
 
@@ -162,7 +163,6 @@ class OrderForm(forms.Form):
     def save(self):
         with transaction.atomic():
             data = self.cleaned_data
-
             # Торт
             price = 0 if data["words"] == "" else 500
 
@@ -190,6 +190,17 @@ class OrderForm(forms.Form):
                 caption=data["words"],
             )
             amount = cake.price
+            order_datetime = datetime.combine(data["order_date"], data["order_time"])
+            order_datetime = timezone.make_aware(
+                order_datetime, timezone.get_current_timezone()
+            )
+
+            now = timezone.now()
+            time_difference = order_datetime - now
+
+            if time_difference < timedelta(hours=24):
+                amount = amount * 1.2
+
             yoomoney_id, url = create_payment(self.request, amount)
             # Чек
             invoice = Invoice.objects.create(

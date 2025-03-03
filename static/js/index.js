@@ -178,9 +178,16 @@ Vue.createApp({
     computed: {
         Cost() {
             let W = this.Words ? this.Costs.Words : 0
-            return this.Costs.Levels[this.Levels] + this.Costs.Forms[this.Form] +
+            let price = (this.Costs.Levels[this.Levels] + this.Costs.Forms[this.Form] +
                 this.Costs.Toppings[this.Topping] + this.Costs.Berries[this.Berries] +
-                this.Costs.Decors[this.Decor] + W
+                this.Costs.Decors[this.Decor] + W) 
+            if (!this.Dates || !this.Time) return price;
+            let selectedDateTime = new Date(`${this.Dates}T${this.Time}`);
+            let now = new Date();
+            let timeDiff = selectedDateTime - now;
+            let hoursDiff = timeDiff / (1000 * 60 * 60);
+            price = hoursDiff < 24 ? `(+20% за <24 часов) ${price * 1.2}` : price
+            return price;
         }
     }
 }).mount('#VueApp')
