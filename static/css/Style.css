@@ -192,7 +192,8 @@ li .cake__textinput:read-only {
     padding: 20px;
     border: 1px solid #888;
     width: 50%; /* Уменьшаем ширину модального окна */
-    height: 10%;
+    min-height: 50px; /* Минимальная высота */
+    max-height: 80vh;
     max-width: 400px; /* Ограничиваем максимальную ширину */
     text-align: center;
     position: relative; /* Для позиционирования крестика */
