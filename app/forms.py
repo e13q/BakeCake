@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from phonenumber_field.formfields import PhoneNumberField
@@ -195,8 +196,6 @@ class OrderForm(forms.Form):
                 amount=amount, yoomoney_id=yoomoney_id, receipt=url
             )
             # Клиент
-            from django.db.models import Q
-
             client = ClientUser.objects.filter(
                 Q(email=data["email"]) | Q(phone_number=data["phone_number"])
             ).first()
